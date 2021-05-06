@@ -1,0 +1,19 @@
+---
+title: "Projects"
+output: html_document
+hidedate: true
+hiderelated: true
+hidediscus: true
+---
+
+Check out some of my coding projects below:
+
+
+<i class="fa fa-signal"></i> &nbsp; [Project 1: Exploratory Data Analysis](/content/project/project1.Rmd/)
+
+<i class="fa fa-line-chart"></i> &nbsp; [Project 2: Modeling, Testing, and Predicting](/content/project/project2.Rmd/)
+
+<!--
+<i class="fa fa-pie-chart"></i> 
+<i class="fa fa-tasks"></i> 
+-->

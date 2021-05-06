@@ -1,0 +1,58 @@
+---
+title: Learning Python!
+author: Taylor Twardowski
+date: '2021-05-05'
+slug: learning-python
+categories: []
+tags: []
+description: 'Executing new Python code we have been learning'
+---
+We've been learning Python recently in our Computational Biology class, so I thought I would share some of the basics and include how R and Python are able to "talk" to each other, through the use of reticulation.
+
+#Python
+For Python basics, I wanted to showcase how lists can be utilized, and replacements within those can be made through modifications. 
+
+Below I generate a list, called "list1" with the numbers 1, 2, 3 and 4. I then tell Python to put "999" in the 3rd position in the list (the first element is the 0th position). The result is included below. 
+
+```{python}
+list1 = [1,2,3,4]
+list1[3]=999
+list1
+```
+
+I then tell Python to insert a 4th position with a "5" in it. When I ask Python to return the 4th position of list1, a 5 is returned. 
+
+```{python}
+list1.insert(4,5)
+list1[4]
+```
+
+Both of these concepts can be seen in the final list1 we are left with, after telling Python to make the necessary modifications to the list we began with.
+
+```{python}
+list1
+```
+
+#Reticulating
+It is possible for R and Python to communicate through reticulation, but we have to install the package and assign variables in each language first. This is shown below, first in R, then in Python. 
+
+```{r}
+library(reticulate)
+
+thank <- "Thank"
+```
+
+```{python}
+thank="you"
+print(r.thank, thank)
+```
+
+Utilizing the print function, specifying the order in which we would like our output to appear (using r.x), we are able to combine language from both R and Python to obtain a combined output (shown above). 
+
+```{r}
+cat(c(thank,py$thank))
+```
+
+Conversely, it's possible to specify a Python object in R code (using py$x). This gives identical output to what was achieved above, it's just performed in the opposite language. 
+
+I've learned so much about both R (and Python) this semester, and I plan to continue learning more about each and maybe even more languages! 

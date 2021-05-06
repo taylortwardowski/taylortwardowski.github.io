@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Taylor Twardowski" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../img/favicon.ico">
+    <title>Learning Python!</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../../../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../../../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../../../../post/">BLOG</a></li>
+        
+        <li><a href="../../../../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../../../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../../../../post/2021/05/05/learning-python/">Learning Python!</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         May 5, 2021 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<p>We’ve been learning Python recently in our Computational Biology class, so I thought I would share some of the basics and include how R and Python are able to “talk” to each other, through the use of reticulation.</p>
+<p>#Python
+For Python basics, I wanted to showcase how lists can be utilized, and replacements within those can be made through modifications.</p>
+<p>Below I generate a list, called “list1” with the numbers 1, 2, 3 and 4. I then tell Python to put “999” in the 3rd position in the list (the first element is the 0th position). The result is included below.</p>
+<pre class="python"><code>list1 = [1,2,3,4]
+list1[3]=999
+list1</code></pre>
+<pre><code>## [1, 2, 3, 999]</code></pre>
+<p>I then tell Python to insert a 4th position with a “5” in it. When I ask Python to return the 4th position of list1, a 5 is returned.</p>
+<pre class="python"><code>list1.insert(4,5)
+list1[4]</code></pre>
+<pre><code>## 5</code></pre>
+<p>Both of these concepts can be seen in the final list1 we are left with, after telling Python to make the necessary modifications to the list we began with.</p>
+<pre class="python"><code>list1</code></pre>
+<pre><code>## [1, 2, 3, 999, 5]</code></pre>
+<p>#Reticulating
+It is possible for R and Python to communicate through reticulation, but we have to install the package and assign variables in each language first. This is shown below, first in R, then in Python.</p>
+<pre class="r"><code>library(reticulate)
+
+thank &lt;- &quot;Thank&quot;</code></pre>
+<pre class="python"><code>thank=&quot;you&quot;
+print(r.thank, thank)</code></pre>
+<pre><code>## Thank you</code></pre>
+<p>Utilizing the print function, specifying the order in which we would like our output to appear (using r.x), we are able to combine language from both R and Python to obtain a combined output (shown above).</p>
+<pre class="r"><code>cat(c(thank,py$thank))</code></pre>
+<pre><code>## Thank you</code></pre>
+<p>Conversely, it’s possible to specify a Python object in R code (using py$x). This gives identical output to what was achieved above, it’s just performed in the opposite language.</p>
+<p>I’ve learned so much about both R (and Python) this semester, and I plan to continue learning more about each and maybe even more languages!</p>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../../../../js/docs.min.js"></script>
+<script src="../../../../../js/main.js"></script>
+
+<script src="../../../../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

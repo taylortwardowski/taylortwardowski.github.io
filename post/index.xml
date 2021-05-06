@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Taylor Twardowski</title>
+    <link>/post/</link>
+    <description>Recent content in Posts on Taylor Twardowski</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Wed, 05 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Learning Python!</title>
+      <link>/post/2021/05/05/learning-python/</link>
+      <pubDate>Wed, 05 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2021/05/05/learning-python/</guid>
+      <description>We’ve been learning Python recently in our Computational Biology class, so I thought I would share some of the basics and include how R and Python are able to “talk” to each other, through the use of reticulation.
+#Python For Python basics, I wanted to showcase how lists can be utilized, and replacements within those can be made through modifications.
+Below I generate a list, called “list1” with the numbers 1, 2, 3 and 4.</description>
+    </item>
+    
+    <item>
+      <title>Summer Plans</title>
+      <link>/post/2021/05/05/summer-plans/</link>
+      <pubDate>Wed, 05 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2021/05/05/summer-plans/</guid>
+      <description>I am very excited to use this summer to relax and recharge. I was hoping to get an internship, however, I began applying for opportunities later than I had originally hoped. I’m now planning to use my free time to work, relax, and take a mental break before starting up in the fall. I’m not one to love taking breaks, but I think this one is quite necessary. More updates to come!</description>
+    </item>
+    
+  </channel>
+</rss>
