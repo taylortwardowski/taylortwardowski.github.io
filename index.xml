@@ -28,6 +28,24 @@ Below I generate a list, called “list1” with the numbers 1, 2, 3 and 4.</des
     </item>
     
     <item>
+      <title>Project 1: Exploratory Data Analysis</title>
+      <link>/project/project1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project1/</guid>
+      <description>Introduction The two datasets being analyzed are ExerciseHours and Pulse. They were acquired through R Studio packages (Lock5Data and Stat2Data) present within the software. I have always been very into exercising and wanted to assess how exercise and pulse rates (both active and resting) relate to each other, if at all. Though the Pulse dataset includes much of this information, the goal is to incorporate the ExerciseHours dataset to better understand the relationships present.</description>
+    </item>
+    
+    <item>
+      <title>Project 2: Modeling, Testing, and Predicting</title>
+      <link>/project/project2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project2/</guid>
+      <description>Introduction The data set being analyzed here is called Participation; it contains 872 observations with a total of 8 variables, to measure the work force participation in Switzerland. The “X1” variable gives a number to each individual whose data was collected. The “lfp” variable shows labor force participation status with either “yes” or “no”. The “lnnlinc” variable gives the log of the non-labor income. The “age” variable gives the age of the individual in years divided by 10.</description>
+    </item>
+    
+    <item>
       <title>Projects</title>
       <link>/projects/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>

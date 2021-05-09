@@ -1,0 +1,333 @@
+---
+title: "Project 2: Modeling, Testing, and Predicting"
+author: "Taylor Twardowski (tnt2353)"
+date: "4/20/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE,fig.align="center",warning=FALSE,message=FALSE,fig.width=8, fig.height=5, linewidth=60)
+options(tibble.width = 100,width = 100)
+library(tidyverse)
+```
+
+## Introduction
+
+The data set being analyzed here is called Participation; it contains 872 observations with a total of 8 variables, to measure the work force participation in Switzerland. The "X1" variable gives a number to each individual whose data was collected. The "lfp" variable shows labor force participation status with either "yes" or "no". The "lnnlinc" variable gives the log of the non-labor income. The "age" variable gives the age of the individual in years divided by 10. The "educ" variable describes the amount of formal education in years. The "nyc" variable gives the number of young children (below the age of 7 years), while the "noc" variable gives the number of older children (7 years or older). Finally, the "foreigner" variable states whether the individual is foreign with "yes" or "no". 
+
+```{R}
+Participation <- read_csv("Participation.csv")
+head(Participation)
+```
+
+## MANOVA
+
+A MANOVA test was run to assess whether a mean difference exists among individual age, education, and log non-labor income across those who participate in the Swiss workforce. 
+
+```{R}
+man1<-manova(cbind(age, educ, lnnlinc)~lfp, data=Participation)
+summary(man1)
+```
+*Overall, the MANOVA test resulted in significance, meaning significant differences exist between those who participate in the Swiss work force on the basis of either mean age, education, non-labor income, or a combination of these.*
+
+Because it is unclear what causes these differences, follow up univariate ANOVAs must be run on each of the individual variables, along with post-hoc t tests.
+
+```{R}
+summary.aov(man1)
+
+pairwise.t.test(Participation$age, Participation$lfp, p.adj="none")
+pairwise.t.test(Participation$educ, Participation$lfp, p.adj="none")
+pairwise.t.test(Participation$lnnlinc, Participation$lfp, p.adj="none")
+```
+*All 3 univariate ANOVAs were significant, using the Bonferroni method. 6 post-hoc t tests were then performed to assess which participant groups differ in age, education, and log non-labor income. The only tests that resulted in significance were those assessing the log non-labor income between those who participate in the workforce and those who don't.*
+
+The probability of at least one type I error occurring within the 6 t tests, mentioned above, was calculated to be 0.1382.
+
+```{R}
+Type1ErrorCount <- replicate(5000, {
+  pvals <- NULL
+    for(i in 1:3){
+      samp1 <- rnorm(20, mean=0)
+      samp2 <- rnorm(20, mean=0)
+      pvals[i] <- t.test(samp1,samp2, var.equal = T)$p.val
+    }
+  sum(pvals<.05)
+})
+
+mean(Type1ErrorCount>0) 
+```
+
+As far as MANOVA assumptions, a few tests were run to test whether they were met.
+
+```{R}
+library(rstatix)
+group <- Participation$lfp
+DVs <- Participation %>% select(educ,age,lnnlinc) #null: multivariate met
+sapply(split(DVs,group), mshapiro_test)
+
+box_m(DVs, group) #null: homogeneity met 
+```
+*When checking the multivariate assumption for a subset of the numeric predictor varibales (age, educ, lnnlinc), a p-value far below alpha is obtained. This indicates a rejection of the null hypothesis, which states the multivariate assumption is met. Additionally, a Box's M test was run to assess homogeneity of covariance. This adjusts the data to meet assumptions. A significant p-value was also obtained from this test, indicating a rejection of the null, which states the homogeneity assumption is met.*
+
+*Assessing other assumptions and whether they were likely to have been met, it is likely that the sample taken was random and that each observation was independent of one another.*
+
+*It is likely the rest of the assumptions failed to have been met. As seen above, multivariate normality and homogeneity were not achieved. Additionally, when assessing the DVs (age, education, and log non-labor income) some sort of correlation is assumed to exist between age and education level and potentially even education level and log non-labor income. These relationships are likely linear, however, so that assumption can be considered "met".*
+
+*Overall this indicates that the data is not ideal in regards of the tests we are attempting to run on it. Any results/conclusions obtained need to be accepted with caution. To combat this issue, randomization tests can next be run.*
+
+## Randomization
+
+A randomization test was run to determine the mean difference in log non-labor income between those involved in the Swiss workforce and those who aren't. The null hypothesis states the mean log non-labor income is the same for those involved in the Swiss workforce and those who aren't. The alternative hypothesis states the mean log non-labor income is not the same for those involved in the Swiss workforce and those who aren't. A plot of the null distribution was also generated with intercept lines at the test statistic, 0.05/-0.05. This value was obtained through multiple permutation tests. 
+
+```{R}
+MeanD <- data.frame(condition=Participation$lfp, lognon=Participation$lnnlinc)
+head(MeanD)
+
+MeanD%>%group_by(condition)%>%
+  summarize(means=mean(lognon))%>%summarize(`mean_diff`=diff(means))
+
+head(perm1<-data.frame(condition=Participation$lfp,lognon=sample(Participation$lnnlinc)))
+perm1%>%group_by(condition)%>%
+  summarize(means=mean(lognon))%>%summarize(`mean_diff`=diff(means))
+
+rand_dist<-vector() #create vector to hold diffs under null hypothesis
+
+for(i in 1:5000){
+new<-data.frame(lognon=sample(Participation$lnnlinc),condition=Participation$lfp)
+rand_dist[i]<-mean(new[new$condition=="yes",]$lognon)-   
+              mean(new[new$condition=="no",]$lognon)} 
+
+mean(rand_dist>0.050 | rand_dist < -0.050)
+
+{hist(rand_dist,main="",ylab=""); abline(v = c(-0.050, 0.050),col="red")}
+```
+*A p-value of 0.0784 was obtained after running 5000 permutations on the sample, meaning we fail to reject the null hypothesis. Because of this, we can say that the mean log non-labor income is the same for those involved in the Swiss workforce and those who aren't. To go one step further, this may also mean that the log non-labor income variable is not an effective predictor of Swiss work force participation status.*
+
+## Linear Regression Model
+
+To assess additional relationships within this data set, a linear regression model was built predicting amount of education from age and non-labor income; their interaction was also assessed. Both numeric variables were mean centered. These variables were utilized, as the other numeric variables are discrete and don't result in a linear regression model that is as effective. 
+
+Linearity, homoskedasticity, and normality assumptions were checked. 
+
+```{R}
+Participation$age_c <- Participation$age - mean(Participation$age, na.rm = T)
+Participation$lnnlinc_c <- Participation$lnnlinc - mean(Participation$lnnlinc, na.rm = T)
+
+linreg <- lm(educ~age_c*lnnlinc_c, data =Participation)
+summary(linreg)
+
+resid<-linreg$residuals
+fitvals<-linreg$fitted.values
+
+ggplot()+geom_point(aes(fitvals,resid))+geom_hline(yintercept=0, color='red') #linearity and homoskedasticity
+
+ggplot()+geom_histogram(aes(resid), bins=20) #normality
+
+ggplot()+geom_qq(aes(sample=resid))+geom_qq_line(aes(sample=resid)) #normality 
+```
+*For the most part, the normality assumption appears to have been met. There is a slight skew to the right, however, we will move forward. As for homoskedasticity and linearity, a pattern appears to exist, which allows us to conclude that these assumptions have not been met.*
+
+*According to the model using mean-centered variables, the mean predicted amount of education obtained for middle-aged individuals that have an average log non-labor income is approximately 9.31 years. For individual's with an average log non-labor income, every 1 year (10 actual years) increase in the their age past the mean age is associated with a 0.52 decrease in the amount of formal education they've obtained. For every 1 unit increase in the log non-labor income of a middle-aged individual, the amount of education obtained is likely to increase by 2.86 years. For every 1 year (10 actual years) increase in age past the mean age, along with a 1 unit increase past the mean log non-labor income, the amount of formal education obtained is likely to decrease by 0.93 years.*
+
+*Only 14.6% of the variation in the outcome is explained by the model. The adjusted R-squared was used, as this value is more conservative and accounts for each explanatory variable.*
+
+These results were recomputed using robust standard errors, as the homoskedasticity assumption was not met. 
+
+```{R}
+library(lmtest)
+library(sandwich)
+coeftest(linreg, vcov = vcovHC(linreg))
+```
+*As before, all relationships resulted in significant results, indicating a linear relationship between amount of formal education obtained, mean age, and mean log non-labor income that is not due to chance. The coefficients for each variable and interaction changed slightly but only beginning in the thousandths place, so not by much.*
+
+The regression, with interaction, was plotted and is included below. 
+
+``` {R}
+Participation%>%ggplot(aes(educ,age_c*lnnlinc_c, color = age_c))+geom_point()+geom_smooth(method = 'lm',se=F)
+```
+
+## Linear Regression with Bootstrapped SEs
+
+Another method that can be utilized when the assumptions have not been met is the use of bootstrapped standard errors. The same regression model from above was run using this method of resampling observations, and the SEs were compared.
+
+```{R}
+Par_dat<- sample_frac(Participation, replace=T)
+
+samp_distn<-replicate(5000, {
+  Par_dat<-Par_dat<-Participation[sample(nrow(Participation),replace=TRUE),]
+  linreg1<-lm(educ ~ age_c * lnnlinc_c, data=Par_dat)
+  coef(linreg1)
+})
+
+samp_distn %>% t %>% as.data.frame %>% summarize_all(sd)
+
+coeftest(linreg)
+coeftest(linreg, vcov = vcovHC(linreg))[,1:2]
+```
+*When comparing the original SEs with the robust and bootstrapped SEs, slight deviations were observed in each, however, nothing drastic. For the intercept, the original SE was 0.095, the robust SE was 0.095, and the bootstrapped SE was 0.096. For a middle-aged individual, the original SE was 0.092, the robust SE was 0.092, and the bootstrapped SE was 0.092. For an individual with an average log non-labor income, the original SE was 0.252, the robust SE was 0.320, and the bootstrapped SE was 0.298. For the interaction between mean age and mean log non-labor income, the original SE was 0.211, the robust SE was 0.347, and the bootstrapped SE was 0.312. Because these values remain fairly constant, we can say that significant overfitting of the model is not occurring, despite important assumptions not having been met initially.*
+
+## Logistic Regression - 2 Variables
+
+To assess additional relationships within this data set, a logistic regression model was generated predicting work force participation status from number of older children and number of younger children.
+
+```{R}
+Participation1 <- Participation %>% mutate(status=ifelse(lfp=="yes",1,0)) 
+head(Participation1)
+  
+logreg <- glm(status~noc+nyc, data=Participation1, family="binomial")
+coeftest(logreg)
+```
+*For an individual with no children, the log-odds of them participating in the Swiss workforce is -0.065. For an individual with no younger children, every 1 unit increase in the number of older children is associated with a 0.077 increase in the log-odds that they participate in the Swiss workforce. For an individual with no older children, every 1 unit increase in the number of younger children is associated with a 0.59 decrease in the log-odds that they participate in the Swiss workforce.*
+
+A confusion matrix was generated for this model and the classification diagnostics were calculated. 
+
+```{R}
+class_diag<-function(probs,truth){
+  
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+  
+  #CALCULATE EXACT AUC
+  ord<-order(probs, decreasing=TRUE)
+  probs <- probs[ord]; truth <- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,auc)
+}
+```
+
+```{R}
+predictreg <-predict(logreg, newdata = Participation1, type="response")
+
+truthreg <-Participation1$status
+
+class_diag(predictreg, truthreg)
+
+table(predict=as.numeric(predictreg>.5),truthreg)%>%addmargins
+```
+*After the confusion matrix was generated, the classification diagnostics could be calculated. The accuracy was 0.561, the sensitivity was 0.514, the specificity was 0.601, the precision was 0.523, and the AUC was 0.591. The AUC is quite poor, as any score below 0.6 is considered not to be good. The rest of the metrics are also not very strong, indicating low effectiveness in the ability of the number of children an individual has in predicting their work force status.*
+
+A density plot of logit was generated, and a significant amount of overlap was observed between the two different outcomes. This supports the idea that a general prediction trend cannot be relied upon whether logit is greater than or less than 0. 
+
+```{R}
+Participation1$logit<-predict(logreg) #save predicted log-odds
+
+Participation1$outcome<-factor(Participation1$lfp,levels=c("yes","no")) #make it a factor for plotting
+
+ggplot(Participation1,aes(logit, fill=outcome))+geom_density(alpha=.3)+
+  geom_vline(xintercept=0,lty=2)
+```
+
+An ROC curve was then generated and the AUC was calculated. 
+
+```{R}
+library(plotROC) 
+ROCplot<-ggplot(Participation1)+geom_roc(aes(d=status,m=noc+nyc), n.cuts=0)
+ROCplot
+
+calc_auc(ROCplot)
+```
+*The ROC curve displays a very linear relationship, which makes sense when compared to the logit plot and classification diagnostics. There is not distinct pattern in how workforce participation status is predicted, given the number of older and younger children an individual has. Additionally, the calculated AUC was 0.4899, which is very bad. Overall, all of these metrics point toward poor predictability between workforce participation status and number of older and younger children. This can be taken one step further to support the test above, which only displays significance regarding number of younger children.*
+   
+##Logistic Regression - All Variables
+
+A logistic regression was performed on the rest of the numeric variables in the data set. 
+
+```{R}
+allreg <- glm(status~lnnlinc+age+educ, data=Participation1, family="binomial")
+coeftest(allreg)
+```
+
+The model was fit and in-sample classification diagnostics were calculated below. 
+    
+```{R}
+proball<-predict(allreg,type="response")
+predall<-ifelse(proball>.5,1,0)
+table(prediction=predall, truth=Participation1$lfp) %>% addmargins
+
+#accuracy
+(336+181)/872
+#sensitivity 
+181/401
+#specificity
+336/471
+#precision
+181/316
+#auc
+ROCplotALL<-ggplot(Participation1)+geom_roc(aes(d=status,m=lnnlinc+age+educ), n.cuts=0) 
+ROCplotALL
+calc_auc(ROCplotALL)
+```
+*The accuracy was 0.593, the sensitivity was 0.451, the specificity was 0.713, the precision was 0.573, and the AUC was 0.421. None of these metrics are all that good, especially the AUC. This supports the idea that the other variables are not strong predictors of Swiss work force participation status.*
+
+A 10-fold CV was run with the model above and the out-of-sample classification diagnostics were calculated below. 
+    
+```{R}
+set.seed(1234)
+k=10
+
+TenF <-Participation1[sample(nrow(Participation1)),] 
+folds<-cut(seq(1:nrow(Participation1)),breaks=k,labels=F) 
+
+diags<-NULL
+for(i in 1:k){         
+train<-TenF[folds!=i,] 
+test<-TenF[folds==i,]  
+
+truth<-test$status
+
+FoldFit <- glm(status~lnnlinc+age+educ,data=train,family="binomial")
+FProb <- predict(FoldFit, newdata=test, type='response')
+
+FDiags<-rbind(diags,class_diag(FProb,truth))
+  }
+
+summarize_all(FDiags,mean)
+```
+*The out-of-sample accuracy was 0.614, the sensitivity was 0.410, the specificity was 0.776, the precision was 0.593, and the AUC was 0.585. Compared to the in-sample metrics, the accuracy, specificity, precision, and AUC all increased. The sensitivity was the only metric that decreased. The AUC improved quite a bit, indicating better predictability within the model when using a 10-fold CV, however, an AUC of 0.585 is still very poor.*
+
+LASSO was performed on the model above to determine which variables should be retained. 
+
+```{R}
+library(glmnet)
+
+Ly<-as.matrix(Participation1$status) #grab response
+Lx<-model.matrix(status~lnnlinc+age+educ,data=Participation1)[,-1] #grab predictors
+head(Lx)
+Lx<-scale(Lx)
+
+set.seed(1234)
+
+CVL <-cv.glmnet(Lx,Ly,family="binomial")
+Lasso<-glmnet(Lx,Ly,family="binomial",lambda=CVL$lambda.min)
+coef(Lasso)
+```
+*LASSO was performed on the model above, however, it did not retain any variables from it. The in and out-of-sample AUCs were very low, which is likely the reason no variables were retained. LASSO penalizes a model for becoming more complex, so it is likely that lowering the predictability from the already poor AUCs caused this.*
+
+In conclusion, the predictor variables in this data set were not effective in predicting the Swiss work force participation status. The data set itself was not ideal, as it failed many of the assumptions necessary for the various tests we ran and models we fit. Though this could have contributed to the reduced effectiveness in predictability, even when corrections were made AUCs and other diagnostic classifications did not improve significantly, so this is unlikely. If I were to make any changes when doing this analysis again, I would plan on finding a different data set that meets assumptions to more accurately assess the effectiveness of predictability when different models are fit to the data. 

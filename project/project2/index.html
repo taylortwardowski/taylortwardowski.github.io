@@ -76,22 +76,7 @@
 <h2>Introduction</h2>
 <p>The data set being analyzed here is called Participation; it contains 872 observations with a total of 8 variables, to measure the work force participation in Switzerland. The “X1” variable gives a number to each individual whose data was collected. The “lfp” variable shows labor force participation status with either “yes” or “no”. The “lnnlinc” variable gives the log of the non-labor income. The “age” variable gives the age of the individual in years divided by 10. The “educ” variable describes the amount of formal education in years. The “nyc” variable gives the number of young children (below the age of 7 years), while the “noc” variable gives the number of older children (7 years or older). Finally, the “foreigner” variable states whether the individual is foreign with “yes” or “no”.</p>
 <pre class="r"><code>Participation &lt;- read_csv(&quot;Participation.csv&quot;)
-read_csv(&quot;Participation.csv&quot;)</code></pre>
-<pre><code>## # A tibble: 872 x 8
-##       X1 lfp   lnnlinc   age  educ   nyc   noc foreign
-##    &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  
-##  1     1 no       10.8   3       8     1     1 no     
-##  2     2 yes      10.5   4.5     8     0     1 no     
-##  3     3 no       11.0   4.6     9     0     0 no     
-##  4     4 no       11.1   3.1    11     2     0 no     
-##  5     5 no       11.1   4.4    12     0     2 no     
-##  6     6 yes      11.0   4.2    12     0     1 no     
-##  7     7 no       11.5   5.1     8     0     0 no     
-##  8     8 yes      10.5   3.2     8     0     2 no     
-##  9     9 no       10.6   3.9    12     0     0 no     
-## 10    10 no       10.5   4.3    11     0     2 no     
-## # … with 862 more rows</code></pre>
-<pre class="r"><code>head(Participation)</code></pre>
+head(Participation)</code></pre>
 <pre><code>## # A tibble: 6 x 8
 ##      X1 lfp   lnnlinc   age  educ   nyc   noc foreign
 ##   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  
@@ -182,7 +167,7 @@ summary(man1)</code></pre>
 })
 
 mean(Type1ErrorCount&gt;0) </code></pre>
-<pre><code>## [1] 0.1436</code></pre>
+<pre><code>## [1] 0.1374</code></pre>
 <p>As far as MANOVA assumptions, a few tests were run to test whether they were met.</p>
 <pre class="r"><code>library(rstatix)
 group &lt;- Participation$lfp
@@ -221,19 +206,19 @@ head(MeanD)</code></pre>
 ##       &lt;dbl&gt;
 ## 1    -0.143</code></pre>
 <pre class="r"><code>head(perm1&lt;-data.frame(condition=Participation$lfp,lognon=sample(Participation$lnnlinc)))</code></pre>
-<pre><code>##   condition    lognon
-## 1        no  9.999619
-## 2       yes 11.304028
-## 3        no 10.517282
-## 4        no 10.619115
-## 5        no 10.421497
-## 6       yes 10.605672</code></pre>
+<pre><code>##   condition   lognon
+## 1        no 10.54673
+## 2       yes 10.25577
+## 3        no 10.56552
+## 4        no 10.23241
+## 5        no 10.44271
+## 6       yes 10.80603</code></pre>
 <pre class="r"><code>perm1%&gt;%group_by(condition)%&gt;%
   summarize(means=mean(lognon))%&gt;%summarize(`mean_diff`=diff(means))</code></pre>
 <pre><code>## # A tibble: 1 x 1
 ##   mean_diff
 ##       &lt;dbl&gt;
-## 1  -0.00415</code></pre>
+## 1    0.0208</code></pre>
 <pre class="r"><code>rand_dist&lt;-vector() #create vector to hold diffs under null hypothesis
 
 for(i in 1:5000){
@@ -242,7 +227,7 @@ rand_dist[i]&lt;-mean(new[new$condition==&quot;yes&quot;,]$lognon)-
               mean(new[new$condition==&quot;no&quot;,]$lognon)} 
 
 mean(rand_dist&gt;0.050 | rand_dist &lt; -0.050)</code></pre>
-<pre><code>## [1] 0.072</code></pre>
+<pre><code>## [1] 0.0758</code></pre>
 <pre class="r"><code>{hist(rand_dist,main=&quot;&quot;,ylab=&quot;&quot;); abline(v = c(-0.050, 0.050),col=&quot;red&quot;)}</code></pre>
 <p><img src="../../project/project2_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" />
 <em>A p-value of 0.0784 was obtained after running 5000 permutations on the sample, meaning we fail to reject the null hypothesis. Because of this, we can say that the mean log non-labor income is the same for those involved in the Swiss workforce and those who aren’t. To go one step further, this may also mean that the log non-labor income variable is not an effective predictor of Swiss work force participation status.</em></p>
@@ -322,8 +307,8 @@ samp_distn&lt;-replicate(5000, {
 })
 
 samp_distn %&gt;% t %&gt;% as.data.frame %&gt;% summarize_all(sd)</code></pre>
-<pre><code>##   (Intercept)      age_c lnnlinc_c age_c:lnnlinc_c
-## 1  0.09591311 0.09429033 0.3009294       0.3041727</code></pre>
+<pre><code>##   (Intercept)    age_c lnnlinc_c age_c:lnnlinc_c
+## 1  0.09622318 0.092796 0.2951985       0.3048273</code></pre>
 <pre class="r"><code>coeftest(linreg)</code></pre>
 <pre><code>##
 ## t test of coefficients:
@@ -430,9 +415,7 @@ ROCplot</code></pre>
 <pre><code>##   PANEL group       AUC
 ## 1     1    -1 0.4899058</code></pre>
 <p><em>The ROC curve displays a very linear relationship, which makes sense when compared to the logit plot and classification diagnostics. There is not distinct pattern in how workforce participation status is predicted, given the number of older and younger children an individual has. Additionally, the calculated AUC was 0.4899, which is very bad. Overall, all of these metrics point toward poor predictability between workforce participation status and number of older and younger children. This can be taken one step further to support the test above, which only displays significance regarding number of younger children.</em></p>
-</div>
-<div id="logistic-regression---all-variables" class="section level2">
-<h2>Logistic Regression - All Variables</h2>
+<p>##Logistic Regression - All Variables</p>
 <p>A logistic regression was performed on the rest of the numeric variables in the data set.</p>
 <pre class="r"><code>allreg &lt;- glm(status~lnnlinc+age+educ, data=Participation1, family=&quot;binomial&quot;)
 coeftest(allreg)</code></pre>
