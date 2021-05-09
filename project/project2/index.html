@@ -167,7 +167,7 @@ summary(man1)</code></pre>
 })
 
 mean(Type1ErrorCount&gt;0) </code></pre>
-<pre><code>## [1] 0.1374</code></pre>
+<pre><code>## [1] 0.1468</code></pre>
 <p>As far as MANOVA assumptions, a few tests were run to test whether they were met.</p>
 <pre class="r"><code>library(rstatix)
 group &lt;- Participation$lfp
@@ -207,18 +207,18 @@ head(MeanD)</code></pre>
 ## 1    -0.143</code></pre>
 <pre class="r"><code>head(perm1&lt;-data.frame(condition=Participation$lfp,lognon=sample(Participation$lnnlinc)))</code></pre>
 <pre><code>##   condition   lognon
-## 1        no 10.54673
-## 2       yes 10.25577
-## 3        no 10.56552
-## 4        no 10.23241
-## 5        no 10.44271
-## 6       yes 10.80603</code></pre>
+## 1        no 11.57404
+## 2       yes 10.32793
+## 3        no 10.61920
+## 4        no 10.87810
+## 5        no 10.63746
+## 6       yes 10.46160</code></pre>
 <pre class="r"><code>perm1%&gt;%group_by(condition)%&gt;%
   summarize(means=mean(lognon))%&gt;%summarize(`mean_diff`=diff(means))</code></pre>
 <pre><code>## # A tibble: 1 x 1
 ##   mean_diff
 ##       &lt;dbl&gt;
-## 1    0.0208</code></pre>
+## 1    0.0185</code></pre>
 <pre class="r"><code>rand_dist&lt;-vector() #create vector to hold diffs under null hypothesis
 
 for(i in 1:5000){
@@ -227,7 +227,7 @@ rand_dist[i]&lt;-mean(new[new$condition==&quot;yes&quot;,]$lognon)-
               mean(new[new$condition==&quot;no&quot;,]$lognon)} 
 
 mean(rand_dist&gt;0.050 | rand_dist &lt; -0.050)</code></pre>
-<pre><code>## [1] 0.0758</code></pre>
+<pre><code>## [1] 0.076</code></pre>
 <pre class="r"><code>{hist(rand_dist,main=&quot;&quot;,ylab=&quot;&quot;); abline(v = c(-0.050, 0.050),col=&quot;red&quot;)}</code></pre>
 <p><img src="../../project/project2_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" />
 <em>A p-value of 0.0784 was obtained after running 5000 permutations on the sample, meaning we fail to reject the null hypothesis. Because of this, we can say that the mean log non-labor income is the same for those involved in the Swiss workforce and those who aren’t. To go one step further, this may also mean that the log non-labor income variable is not an effective predictor of Swiss work force participation status.</em></p>
@@ -307,8 +307,8 @@ samp_distn&lt;-replicate(5000, {
 })
 
 samp_distn %&gt;% t %&gt;% as.data.frame %&gt;% summarize_all(sd)</code></pre>
-<pre><code>##   (Intercept)    age_c lnnlinc_c age_c:lnnlinc_c
-## 1  0.09622318 0.092796 0.2951985       0.3048273</code></pre>
+<pre><code>##   (Intercept)      age_c lnnlinc_c age_c:lnnlinc_c
+## 1  0.09354832 0.09172707 0.2993409        0.303275</code></pre>
 <pre class="r"><code>coeftest(linreg)</code></pre>
 <pre><code>##
 ## t test of coefficients:
