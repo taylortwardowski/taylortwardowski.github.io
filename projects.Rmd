@@ -9,9 +9,9 @@ hidediscus: true
 Check out some of my coding projects below:
 
 
-<i class="fa fa-signal"></i> &nbsp; [Project 1: Exploratory Data Analysis](~/project/project1.Rmd/)
+<i class="fa fa-signal"></i> &nbsp; [Project 1: Exploratory Data Analysis](/project/project1.Rmd/)
 
-<i class="fa fa-line-chart"></i> &nbsp; [Project 2: Modeling, Testing, and Predicting](~/project/project2.Rmd/)
+<i class="fa fa-line-chart"></i> &nbsp; [Project 2: Modeling, Testing, and Predicting](/project/project2.Rmd/)
 
 <!--
 <i class="fa fa-pie-chart"></i> 
